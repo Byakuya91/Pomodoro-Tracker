@@ -1,6 +1,13 @@
 import React from "react";
 
-const TimerControls = ({ status, onStart, onPause, onReset }) => {
+const TimerControls = ({
+  status,
+  onStart,
+  onPause,
+  onReset,
+  CustomTime,
+  CustomTCustomTimeDurationimeDuration,
+}) => {
   return (
     <div>
       {/* Start Button: Only show when timer is paused or stopped */}

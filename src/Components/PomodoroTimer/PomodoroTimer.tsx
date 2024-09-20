@@ -35,6 +35,8 @@ const PomodoroTimer = () => {
   const [pomodoroCount, setPomodoroCount] = useState<number>(0);
   // Interval ID to track the setInterval
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  // Custom time duration
+  const [customTime, setCustomTime] = useState<number>(25);
 
   console.log("the interval id is", intervalId);
   console.log("the status  is", status);
@@ -86,6 +88,23 @@ const PomodoroTimer = () => {
     }
   };
 
+  // Handler for custom time duration input
+  const handleCustomTimeDurationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // create value
+    const value = parseInt(event.target.value, 10);
+
+    if (!isNaN(value) && value > 0) {
+      setCustomTime(value); // Update custom duration in minutes
+    }
+  };
+
+  // Handler for setting custom time
+  const handleSetCustomTime = () => {
+    setTimeRemaining(customTime * 60); // Convert minutes to seconds
+  };
+
   // Clean up when the component unmounts or the interval changes
   useEffect(() => {
     return () => {
@@ -98,7 +117,18 @@ const PomodoroTimer = () => {
   return (
     <div>
       <h1>Pomodoro Timer</h1>
-      {/* Pass state and handlers to TimerDisplay and TimerControls */}
+      <div className="customControls">
+        <label htmlFor="customTimeInput">
+          Set Custom Pomodoro Duration (Minutes):
+        </label>
+        <input
+          type="number"
+          value={customTime}
+          onChange={handleCustomTimeDurationChange}
+          min="1"
+        />
+        <button onClick={handleSetCustomTime}>Set Custom Time</button>
+      </div>
       <TimerDisplay
         timeRemaining={timeRemaining}
         pomodoroCount={pomodoroCount}
@@ -108,6 +138,8 @@ const PomodoroTimer = () => {
         onStart={handleStart}
         onPause={handlePause}
         onReset={handleReset}
+        CustomTime={handleSetCustomTime}
+        CustomTimeDuration={handleCustomTimeDurationChange}
       />
     </div>
   );
