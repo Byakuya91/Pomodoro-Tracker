@@ -22,11 +22,11 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
       {sessionType === "pomodoro" && <h2>Time remaining:{formattedTime}</h2>}
 
       {sessionType === "short-break" && (
-        <h2>Break time Remaining:{formattedTime}</h2>
+        <h2>Short Break time Remaining:{formattedTime}</h2>
       )}
 
       {sessionType === "long-break" && (
-        <h2> Break time Remaining:{formattedTime}</h2>
+        <h2> Long Break time Remaining:{formattedTime}</h2>
       )}
 
       <h3>Pomodoros Completed: {pomodoroCount}</h3>
