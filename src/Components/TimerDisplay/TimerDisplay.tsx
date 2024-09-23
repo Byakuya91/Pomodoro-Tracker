@@ -6,18 +6,29 @@ import React from "react";
 interface TimerDisplayProps {
   timeRemaining: number;
   pomodoroCount: number;
+  sessionType: string;
 }
 
 const TimerDisplay: React.FC<TimerDisplayProps> = ({
   timeRemaining,
   pomodoroCount,
+  sessionType,
 }) => {
   //  Format the time using the format time utility function(NEED to CODE)
   const formattedTime = formatTime(timeRemaining);
 
   return (
-    <div>
-      <h2>Time Remaining: {formattedTime}</h2>
+    <div className="timerDisplayFace">
+      {sessionType === "pomodoro" && <h2>Time remaining:{formattedTime}</h2>}
+
+      {sessionType === "short-break" && (
+        <h2>Break time Remaining:{formattedTime}</h2>
+      )}
+
+      {sessionType === "long-break" && (
+        <h2> Break time Remaining:{formattedTime}</h2>
+      )}
+
       <h3>Pomodoros Completed: {pomodoroCount}</h3>
     </div>
   );
