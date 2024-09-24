@@ -26,7 +26,6 @@ enum TimerStatus {
 }
 
 // Define SessionTypes Enums
-
 enum SessionType {
   Pomodoro = "pomodoro",
   ShortBreak = "short-break",
@@ -35,26 +34,30 @@ enum SessionType {
 
 const PomodoroTimer = () => {
   // ?State for the timer and controls
-  // Time remaining (default 25 minutes)
-  const [timeRemaining, setTimeRemaining] = useState<number>(25 * 60);
-  // Timer status
+  const [timeRemaining, setTimeRemaining] = useState<number>(25 * 60); // Default 25 min
   const [status, setStatus] = useState<TimerStatus>(TimerStatus.Stopped);
-  // Sessions for the Pomodoro
   const [pomodoroCount, setPomodoroCount] = useState<number>(0);
-  // Interval ID to track the setInterval
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
-  // Custom time duration
   const [customTime, setCustomTime] = useState<number>(25);
-  // SessionType for breaks or Pomodoro
   const [sessionType, setSessionType] = useState<SessionType>(
     SessionType.Pomodoro
   );
-  // break duration for Pomodoros
   const [breakDuration, setBreakDuration] = useState<number>(5 * 60); // Default short break (5 minutes)
 
-  // console.log("the interval id is", intervalId);
-  // console.log("the status  is", status);
-  // console.log("The time remaining is,", timeRemaining);
+  // ? New: Flag to prevent multiple increments
+  const [sessionJustSwitched, setSessionJustSwitched] =
+    useState<boolean>(false);
+
+  console.log("The current Pomodoro Session count is: ", pomodoroCount);
+  console.log("The sessionJustSwitched flag is: ", sessionJustSwitched);
+
+  // ?Effect to handle session switching when timeRemaining hits 0
+  useEffect(() => {
+    if (timeRemaining === 0 && !sessionJustSwitched) {
+      handleSessionSwitch(); // Trigger session switch when time reaches 0
+      setSessionJustSwitched(true); // Prevent multiple switches
+    }
+  }, [timeRemaining, sessionJustSwitched]);
 
   // ?Handler Functions for the Controls
 
@@ -69,12 +72,9 @@ const PomodoroTimer = () => {
           if (prevTime > 0) {
             return prevTime - 1; // Decrease time by 1 second
           } else {
-            // Time reached 0, stop the timer
-            clearInterval(id);
-            setStatus(TimerStatus.Stopped);
-            setPomodoroCount((prevCount) => prevCount + 1); // Increment pomodoro count
-            handleSessionSwitch();
-            return 0;
+            clearInterval(id); // Stop the timer when time reaches 0
+            setIntervalId(null);
+            return 0; // Ensure time doesn't go negative
           }
         });
       }, 1000); // Decrease time every 1000ms (1 second)
@@ -82,10 +82,26 @@ const PomodoroTimer = () => {
     }
   };
 
+  // Switch between Pomodoro and Breaks
+  const handleSessionSwitch = () => {
+    if (sessionType === SessionType.Pomodoro) {
+      // Increment Pomodoro count once, switch to break
+      setPomodoroCount((prevCount) => prevCount + 1);
+      setSessionType(SessionType.ShortBreak);
+      setTimeRemaining(breakDuration); // Set break time
+    } else {
+      // Switch back to Pomodoro after break
+      setSessionType(SessionType.Pomodoro);
+      setTimeRemaining(customTime * 60); // Set Pomodoro time
+    }
+
+    // Reset flag to allow next session switch
+    setSessionJustSwitched(false);
+  };
+
   // Pause the timer
   const handlePause = () => {
     setStatus(TimerStatus.Paused);
-
     if (intervalId) {
       clearInterval(intervalId); // Clear the interval
       setIntervalId(null); // Reset the interval ID
@@ -95,44 +111,30 @@ const PomodoroTimer = () => {
   // Reset the timer
   const handleReset = () => {
     setStatus(TimerStatus.Stopped);
-    setTimeRemaining(25 * 60); // Reset to 25 minutes
-
+    setTimeRemaining(customTime * 60); // Reset to custom Pomodoro time
     if (intervalId) {
       clearInterval(intervalId); // Clear the interval
       setIntervalId(null); // Reset the interval ID
     }
+    setSessionJustSwitched(false); // Reset flag on reset
   };
 
-  // Switch between Pomodoro and Breaks
-  const handleSessionSwitch = () => {
-    if (sessionType === SessionType.Pomodoro) {
-      //? Switch to short break after Pomodoro
-      setSessionType(SessionType.ShortBreak);
-      // Set Break time
-      setTimeRemaining(breakDuration);
-    } else {
-      // Switch back to Pomodoro after break
-      setSessionType(SessionType.Pomodoro);
-      // Set Pomodoro time
-      setTimeRemaining(25 * 60);
-    }
-  };
   // Dropdown Handler for session type
   const handleBreakDurationChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const breakValue = parseInt(event.target.value, 10);
-    // convert the mins to seconds
-    setBreakDuration(breakValue * 60);
+    setBreakDuration(breakValue * 60); // Convert minutes to seconds
+    if (sessionType !== SessionType.Pomodoro) {
+      setTimeRemaining(breakValue * 60); // Update break time if in break session
+    }
   };
 
   // Handler for custom time duration input
   const handleCustomTimeDurationChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    // create value
     const value = parseInt(event.target.value, 10);
-
     if (!isNaN(value) && value > 0) {
       setCustomTime(value); // Update custom duration in minutes
     }
@@ -160,17 +162,21 @@ const PomodoroTimer = () => {
         pomodoroCount={pomodoroCount}
         sessionType={sessionType}
       />
-      <div className="BreakControls">
-        <label htmlFor="breakDuration">Select Break duration:</label>
-        <select id="breakDuration" onChange={handleBreakDurationChange}>
-          <option value="5">Short break (5mins)</option>
-          <option value="10">Short break (10 minutes)</option>
-          <option value="15">Long Break(15 minutes)</option>
-          <option value="20">Long Break (20 minutes)</option>
-          <option value="25">Long Break (25 minutes)</option>
-          <option value="30">Long Break (30 minutes)</option>
-        </select>
-      </div>
+
+      {sessionType !== SessionType.Pomodoro && (
+        <div className="BreakControls">
+          <label htmlFor="breakDuration">Select Break duration:</label>
+          <select id="breakDuration" onChange={handleBreakDurationChange}>
+            <option value="5">Short break (5 mins)</option>
+            <option value="10">Short break (10 minutes)</option>
+            <option value="15">Long Break (15 minutes)</option>
+            <option value="20">Long Break (20 minutes)</option>
+            <option value="25">Long Break (25 minutes)</option>
+            <option value="30">Long Break (30 minutes)</option>
+          </select>
+        </div>
+      )}
+
       <TimerControls
         status={status}
         onStart={handleStart}
