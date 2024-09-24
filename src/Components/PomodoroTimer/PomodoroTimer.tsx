@@ -111,7 +111,18 @@ const PomodoroTimer = () => {
   // Reset the timer
   const handleReset = () => {
     setStatus(TimerStatus.Stopped);
-    setTimeRemaining(customTime * 60); // Reset to custom Pomodoro time
+    // ! Problem1: the reset button when hit resets back to default 25 mins as opposed to custom time.
+    // ! Problem2: When in break session, the reset button resets back to default 25 mins for Pomodoro as opposed to custom time for the breaks(SOLVED)
+
+    // ?Solution to problem1(Normal logic)
+    if (sessionType === SessionType.Pomodoro) {
+      setTimeRemaining(customTime * 60); // Reset to custom Pomodoro time
+    } else if (sessionType === SessionType.ShortBreak) {
+      setTimeRemaining(breakDuration); // Reset to short break time
+    } else if (sessionType === SessionType.LongBreak) {
+      setTimeRemaining(breakDuration); // Reset to long break time
+    }
+
     if (intervalId) {
       clearInterval(intervalId); // Clear the interval
       setIntervalId(null); // Reset the interval ID
