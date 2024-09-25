@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 // ?Component imports
 import TimerDisplay from "../TimerDisplay/TimerDisplay";
 import TimerControls from "../TimerControls/TimerControls";
+import AlertManager from "../Notifications/AlertManager";
 
 // ?Other Imports
 
@@ -48,8 +49,13 @@ const PomodoroTimer = () => {
   const [sessionJustSwitched, setSessionJustSwitched] =
     useState<boolean>(false);
 
+  // ? New flag: Notification triggered when timeRemaining hits 0
+  const [notificationTriggered, setNotificationTriggered] =
+    useState<boolean>(false); // New flag
+
   console.log("The current Pomodoro Session count is: ", pomodoroCount);
   console.log("The sessionJustSwitched flag is: ", sessionJustSwitched);
+  console.log("The notification flag is: ", notificationTriggered);
 
   // ?Effect to handle session switching when timeRemaining hits 0
   useEffect(() => {
@@ -57,7 +63,12 @@ const PomodoroTimer = () => {
       handleSessionSwitch(); // Trigger session switch when time reaches 0
       setSessionJustSwitched(true); // Prevent multiple switches
     }
-  }, [timeRemaining, sessionJustSwitched]);
+
+    // Trigger notification only when time hits 0 and it's the first time
+    if (timeRemaining === 0 && !notificationTriggered) {
+      setNotificationTriggered(true); // Prevent further notifications
+    }
+  }, [timeRemaining, sessionJustSwitched, notificationTriggered]);
 
   // ?Handler Functions for the Controls
 
@@ -97,6 +108,7 @@ const PomodoroTimer = () => {
 
     // Reset flag to allow next session switch
     setSessionJustSwitched(false);
+    setNotificationTriggered(false); // Reset the notification flag for the next session
   };
 
   // Pause the timer
@@ -128,6 +140,7 @@ const PomodoroTimer = () => {
       setIntervalId(null); // Reset the interval ID
     }
     setSessionJustSwitched(false); // Reset flag on reset
+    setNotificationTriggered(false); // Reset the notification flag for the next session
   };
 
   // Dropdown Handler for session type
@@ -197,6 +210,10 @@ const PomodoroTimer = () => {
         onCustomTimeChange={handleCustomTimeDurationChange}
         onSetCustomTime={handleSetCustomTime}
       />
+      {/* Render AlertManager to trigger notifications when session ends */}
+      {timeRemaining === 0 && !notificationTriggered && (
+        <AlertManager sessionType={sessionType} />
+      )}
     </div>
   );
 };

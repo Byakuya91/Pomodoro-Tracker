@@ -3,6 +3,8 @@
 import PomodoroTimer from "./Components/PomodoroTimer/PomodoroTimer";
 
 // ? Third-Party
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // TODO:
 // 1) Create the boilerplate and setup folders(DONE)
@@ -13,6 +15,11 @@ function App() {
     <>
       <h1>PT Header</h1>
       <PomodoroTimer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+      />
     </>
   );
 }
