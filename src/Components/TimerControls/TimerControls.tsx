@@ -16,13 +16,21 @@ const TimerControls = ({
         <label htmlFor="customTimeInput">
           Set Custom Pomodoro Duration (Minutes):
         </label>
-        <input
-          type="number"
+        <select
+          id="customTimeSelect"
           value={customTime}
-          onChange={onCustomTimeChange}
-          min="1"
-        />
-        <button onClick={onSetCustomTime}>Set Custom Time</button>
+          onChange={(e) => onCustomTimeChange(e)}
+        >
+          <option value="5">5 minutes</option>
+          <option value="10">10 minutes</option>
+          <option value="15">15 minutes</option>
+          <option value="20">20 minutes</option>
+          <option value="25">25 minutes</option>
+          <option value="30">30 minutes</option>
+          <option value="45">45 minutes</option>
+          <option value="60">1 hour</option>
+        </select>
+        {/* <button onClick={onSetCustomTime}>Set Custom Time</button> */}
       </div>
 
       {/* Start Button */}

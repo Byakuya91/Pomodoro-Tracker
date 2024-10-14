@@ -53,9 +53,10 @@ const PomodoroTimer = () => {
   const [notificationTriggered, setNotificationTriggered] =
     useState<boolean>(false); // New flag
 
-  console.log("The current Pomodoro Session count is: ", pomodoroCount);
-  console.log("The sessionJustSwitched flag is: ", sessionJustSwitched);
-  console.log("The notification flag is: ", notificationTriggered);
+  // console.log("The current Pomodoro Session count is: ", pomodoroCount);
+  // console.log("The sessionJustSwitched flag is: ", sessionJustSwitched);
+  // console.log("The notification flag is: ", notificationTriggered);
+  // console.log("The session type is: ", sessionType);
 
   // ?Effect to handle session switching when timeRemaining hits 0
   useEffect(() => {
@@ -75,6 +76,8 @@ const PomodoroTimer = () => {
   // Start the timer
   const handleStart = () => {
     setStatus(TimerStatus.Running);
+    // ?resetting the session switch flag
+    setSessionJustSwitched(false);
 
     // If there's no interval running, start a new one
     if (!intervalId) {
@@ -107,7 +110,7 @@ const PomodoroTimer = () => {
     }
 
     // Reset flag to allow next session switch
-    setSessionJustSwitched(false);
+    setSessionJustSwitched(true);
     setNotificationTriggered(false); // Reset the notification flag for the next session
   };
 
@@ -177,6 +180,17 @@ const PomodoroTimer = () => {
       }
     };
   }, [intervalId]);
+
+  // Update timeRemaining when customTime changes and the timer is not running
+  useEffect(() => {
+    if (
+      status === TimerStatus.Stopped &&
+      sessionType === SessionType.Pomodoro
+    ) {
+      setTimeRemaining(customTime * 60); // Set the new custom time in seconds
+      console.log("Use Effect in effect.");
+    }
+  }, [customTime, status, sessionType]);
 
   return (
     <div>
