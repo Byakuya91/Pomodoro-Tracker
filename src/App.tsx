@@ -16,7 +16,7 @@ import HomePage from "./Pages/HomePage";
 function App() {
   return (
     <>
-      <h1>PT Header</h1>
+      <h1>Productivity Library: A place to track your productivity</h1>
       {/* <PomodoroTimer />
       <ToastContainer
         position="top-right"
