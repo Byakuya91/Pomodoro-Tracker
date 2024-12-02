@@ -71,6 +71,23 @@ const PomodoroTimer = () => {
     }
   }, [timeRemaining, sessionJustSwitched, notificationTriggered]);
 
+  // ? saving pomodoro data in localStorage
+
+  const setTimeRemainingAndSave = (newTime: number) => {
+    setTimeRemaining(newTime);
+    localStorage.setItem("timeRemaining", newTime.toString());
+  };
+
+  const setSessionTypeAndSave = (newSessionType: SessionType) => {
+    setSessionType(newSessionType);
+    localStorage.setItem("sessionType", newSessionType);
+  };
+
+  const setPomodoroCountAndSave = (newCount: number) => {
+    setPomodoroCount(newCount);
+    localStorage.setItem("pomodoroCount", newCount.toString());
+  };
+
   // ?Handler Functions for the Controls
 
   // Start the timer
@@ -172,6 +189,15 @@ const PomodoroTimer = () => {
     setTimeRemaining(customTime * 60); // Convert minutes to seconds
   };
 
+  // ?TODO: Integrate functions to save local storage
+
+  // ?Update and save Session Type
+
+  // ?Update and save Pomodoro Count
+
+  // ? Update and save Time Remaining
+
+  // ! UseEffects for the application logic
   // Clean up when the component unmounts or the interval changes
   useEffect(() => {
     return () => {
@@ -191,6 +217,24 @@ const PomodoroTimer = () => {
       console.log("Use Effect in effect.");
     }
   }, [customTime, status, sessionType]);
+
+  useEffect(() => {
+    const saveTimeRemaining = localStorage.getItem("timeRemaining");
+    const saveSessionType = localStorage.getItem("sessionType");
+    const savePomodoroCount = localStorage.getItem("pomodoroCount");
+
+    // ? Update types for JSON parsing
+
+    if (saveTimeRemaining) {
+      setTimeRemaining(Number(saveTimeRemaining));
+    }
+    if (saveSessionType) {
+      setSessionType(saveSessionType as SessionType); // Cast to SessionType
+    }
+    if (savePomodoroCount) {
+      setPomodoroCount(Number(savePomodoroCount));
+    }
+  }, []);
 
   return (
     <div>
