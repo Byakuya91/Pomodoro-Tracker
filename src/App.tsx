@@ -6,6 +6,8 @@ import PomodoroTimer from "./Components/PomodoroTimer/PomodoroTimer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { useNavigate } from "react-router-dom";
+
 // ?Pages Imports
 import HomePage from "./Pages/HomePage";
 
@@ -14,16 +16,20 @@ import HomePage from "./Pages/HomePage";
 // 2) Work on displaying the time and controls for starting and stopping the timer(ONGOING)
 
 function App() {
+  // implementing useNavigate Hook
+  const navigate = useNavigate();
   return (
     <>
-      <h1>Productivity Library: A place to track your productivity</h1>
-      {/* <PomodoroTimer />
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-      /> */}
+      <header>
+        <h1>Productivity Library: A place to track your productivity</h1>
+      </header>
       <HomePage />
+      <main>
+        <div className="nav-btns-container">
+          <button onClick={() => navigate("/timer")}>Pomodoro Timer</button>
+          <button onClick={() => navigate("/history")}>Session history</button>
+        </div>
+      </main>
     </>
   );
 }
